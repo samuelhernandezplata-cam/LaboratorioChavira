@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ERP — Laboratorio Chavira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — LABORATORIO CHAVIRA v1.0
+    ============================================================ */
+    :root {
+      --lc-primary:#2695d0; --lc-primary-light:#e6f4fb; --lc-primary-mid:#7ec4e8;
+      --lc-primary-dark:#1a6e9e; --lc-secondary:#ca494e;
+      --lc-warning:#D97706; --lc-warning-bg:#fef3c7; --lc-warning-text:#92400e;
+      --lc-info-bg:#e6f4fb; --lc-info-text:#1a6e9e;
+      --lc-neutral-bg:#F3F4F6; --lc-neutral-text:#374151;
+      --lc-bg-page:#F4F7FA; --lc-bg-card:#FFFFFF; --lc-bg-surface:#EEF2F6;
+      --lc-bg-header:#1a6e9e; --lc-text-primary:#0f1f2e; --lc-text-secondary:#5a6878;
+      --lc-border:rgba(0,0,0,0.10);
+      --lc-font-sans:'Roboto','Segoe UI',Arial,sans-serif;
+      --lc-font-mono:'Roboto Mono','Courier New',monospace;
+      --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:999px;
+      --sw:248px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--lc-font-sans);font-size:14px;color:var(--lc-text-primary);
+         background:var(--lc-bg-page);line-height:1.6;-webkit-font-smoothing:antialiased;
+         display:flex;min-height:100vh;}
+    a{color:var(--lc-primary);text-decoration:none;}
+    a:hover{color:var(--lc-primary-dark);}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sw);background:#0f1f2e;height:100vh;position:fixed;top:0;left:0;
+             display:flex;flex-direction:column;z-index:200;overflow-y:auto;overflow-x:hidden;
+             transition:transform .25s ease,width .25s ease;}
+    .sidebar.collapsed{width:56px;}
+    .sidebar.collapsed .sb-lbl,.sidebar.collapsed .sb-sec,.sidebar.collapsed .sb-logotxt{display:none;}
+    .sidebar.collapsed .nav-item{justify-content:center;padding:10px 0;}
+    .sb-logo{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;
+             border-bottom:.5px solid rgba(255,255,255,.07);flex-shrink:0;}
+    .sb-logoicon{width:36px;height:36px;flex-shrink:0;background:var(--lc-secondary);
+                 border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;}
+    .sb-logoicon svg{width:20px;height:20px;fill:#fff;}
+    .sb-logotxt .name{font-size:13px;font-weight:600;color:#fff;line-height:1.2;white-space:nowrap;}
+    .sb-logotxt .sub{font-size:10px;color:rgba(255,255,255,.38);letter-spacing:.05em;text-transform:uppercase;}
+    .sb-nav{flex:1;padding:10px 0;}
+    .sb-sec{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+            color:rgba(255,255,255,.28);padding:14px 16px 5px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:12px;
+              color:rgba(255,255,255,.52);cursor:pointer;white-space:nowrap;
+              border:none;background:none;width:100%;text-align:left;
+              font-family:var(--lc-font-sans);border-left:3px solid transparent;
+              transition:background .15s,color .15s;}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.82);}
+    .nav-item.active{background:rgba(38,149,208,.16);color:#fff;border-left-color:var(--lc-primary);}
+    .nav-icon{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+    .nav-icon svg{width:15px;height:15px;}
+    .sb-foot{padding:12px 16px;border-top:.5px solid rgba(255,255,255,.07);
+             font-size:10px;color:rgba(255,255,255,.22);}
+
+    /* MAIN */
+    .main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;
+          transition:margin-left .25s ease;}
+    .main.expanded{margin-left:56px;}
+
+    /* HEADER */
+    .hdr{background:var(--lc-bg-header);padding:0 24px;position:sticky;top:0;z-index:100;
+         border-bottom:1px solid rgba(255,255,255,.06);}
+    .hdr-inner{height:52px;display:flex;align-items:center;justify-content:space-between;}
+    .hdr-left{display:flex;align-items:center;gap:12px;}
+    .hdr-right{display:flex;align-items:center;gap:10px;}
+    .tog-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.55);
+             display:flex;align-items:center;justify-content:center;
+             width:32px;height:32px;border-radius:var(--r-sm);transition:background .15s,color .15s;}
+    .tog-btn:hover{background:rgba(255,255,255,.10);color:#fff;}
+    .tog-btn svg{width:20px;height:20px;}
+    .bc{display:flex;align-items:center;gap:6px;font-size:12px;}
+    .bc-item{color:rgba(255,255,255,.45);}
+    .bc-sep{color:rgba(255,255,255,.22);font-size:11px;}
+    .bc-active{color:#fff;font-weight:500;}
+    .hdr-badge{display:inline-flex;align-items:center;gap:6px;
+               background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.12);
+               border-radius:var(--r-pill);padding:4px 12px;font-size:11px;color:rgba(255,255,255,.60);}
+    .hdr-dot{width:6px;height:6px;background:var(--lc-primary);border-radius:50%;}
+
+    /* WORK ZONE */
+    .wz{flex:1;padding:28px 28px 40px;max-width:1180px;width:100%;}
+
+    /* TYPOGRAPHY */
+    .pg-title{font-size:22px;font-weight:600;margin-bottom:4px;}
+    .pg-subtitle{font-size:12px;color:var(--lc-text-secondary);margin-bottom:28px;}
+    .sec-label{font-size:11px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+               color:var(--lc-text-secondary);margin-bottom:14px;
+               padding-bottom:8px;border-bottom:.5px solid var(--lc-border);}
+
+    /* CARDS */
+    .lc-card{background:var(--lc-bg-card);border:.5px solid var(--lc-border);
+             border-radius:var(--r-lg);padding:16px 18px;}
+
+    /* MODULE MAP */
+    .mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+    .mod-card{background:var(--lc-bg-card);border:.5px solid var(--lc-border);
+              border-radius:var(--r-lg);padding:20px;cursor:pointer;
+              position:relative;overflow:hidden;
+              transition:border-color .18s,transform .14s,box-shadow .18s;}
+    .mod-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+                      background:var(--lc-primary);border-radius:var(--r-lg) var(--r-lg) 0 0;}
+    .mod-card:hover{border-color:var(--lc-primary-mid);box-shadow:0 4px 18px rgba(38,149,208,.10);transform:translateY(-2px);}
+    .mc-icon{width:42px;height:42px;border-radius:var(--r-md);
+             background:var(--lc-primary-light);display:flex;align-items:center;
+             justify-content:center;color:var(--lc-primary);margin-bottom:14px;}
+    .mc-icon svg{width:22px;height:22px;}
+    .mc-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+    .mc-desc{font-size:12px;color:var(--lc-text-secondary);margin-bottom:14px;line-height:1.5;}
+    .mc-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;
+           padding:3px 8px;border-radius:var(--r-pill);white-space:nowrap;}
+    .b-info{background:var(--lc-info-bg);color:var(--lc-info-text);}
+    .b-neutral{background:var(--lc-neutral-bg);color:var(--lc-neutral-text);}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r-md);
+         padding:8px 16px;font-family:var(--lc-font-sans);font-size:12px;font-weight:500;
+         cursor:pointer;text-decoration:none;transition:background .15s;white-space:nowrap;}
+    .btn-primary{background:var(--lc-primary);color:#fff;}
+    .btn-primary:hover{background:var(--lc-primary-dark);color:#fff;}
+    .btn-outline{background:transparent;color:var(--lc-primary);border:1px solid var(--lc-primary);}
+    .btn-outline:hover{background:var(--lc-primary-light);}
+    .btn-sm{padding:5px 11px;font-size:11px;border-radius:var(--r-sm);}
+
+    /* TABS */
+    .tabs{display:flex;border-bottom:1.5px solid var(--lc-border);margin-bottom:22px;}
+    .tab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--lc-text-secondary);
+         cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;
+         margin-bottom:-1.5px;font-family:var(--lc-font-sans);
+         transition:color .15s,border-color .15s;}
+    .tab.active{color:var(--lc-primary);border-bottom-color:var(--lc-primary);}
+    .tab:hover:not(.active){color:var(--lc-text-primary);}
+
+    /* PROCS */
+    .proc{display:flex;gap:14px;padding:13px 0;border-bottom:.5px solid var(--lc-border);}
+    .proc:last-child{border-bottom:none;}
+    .proc-num{width:26px;height:26px;flex-shrink:0;border-radius:50%;
+              background:var(--lc-info-bg);color:var(--lc-primary);
+              font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+    .proc-title{font-size:14px;font-weight:500;margin-bottom:3px;}
+    .proc-desc{font-size:12px;color:var(--lc-text-secondary);}
+
+    /* FORMAT ITEMS */
+    .fi{display:flex;align-items:center;justify-content:space-between;
+        padding:11px 16px;border-bottom:.5px solid var(--lc-border);
+        gap:12px;transition:background .12s;}
+    .fi:last-child{border-bottom:none;}
+    .fi:hover{background:var(--lc-primary-light);}
+    .fi-ico{width:32px;height:32px;flex-shrink:0;border-radius:var(--r-sm);
+            background:var(--lc-info-bg);color:var(--lc-info-text);
+            display:flex;align-items:center;justify-content:center;}
+    .fi-name{font-size:13px;font-weight:500;}
+    .fi-desc{font-size:11px;color:var(--lc-text-secondary);}
+
+    /* TABLE */
+    .tbl-wrap{background:var(--lc-bg-card);border:.5px solid var(--lc-border);
+              border-radius:var(--r-lg);overflow:hidden;}
+    .lc-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .lc-table thead{background:var(--lc-bg-surface);}
+    .lc-table thead th{padding:9px 14px;text-align:left;font-size:11px;font-weight:500;
+                       letter-spacing:.07em;text-transform:uppercase;
+                       color:var(--lc-text-secondary);border-bottom:.5px solid var(--lc-border);}
+    .lc-table tbody td{padding:10px 14px;border-bottom:.5px solid var(--lc-border);vertical-align:middle;}
+    .lc-table tbody tr:last-child td{border-bottom:none;}
+    .lc-table tbody tr:hover{background:var(--lc-primary-light);}
+
+    /* ALERTS */
+    .alert{display:flex;align-items:flex-start;gap:8px;padding:12px 16px;
+           border-radius:var(--r-md);font-size:13px;}
+    .a-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+    .a-info{background:var(--lc-info-bg);color:var(--lc-info-text);}
+    .a-info .a-dot{background:var(--lc-primary);}
+    .a-warning{background:var(--lc-warning-bg);color:var(--lc-warning-text);}
+    .a-warning .a-dot{background:var(--lc-warning);}
+
+    /* CONNECTION GUIDE */
+    .conn-wrap{background:var(--lc-bg-card);border:.5px solid var(--lc-border);
+               border-radius:var(--r-lg);overflow:hidden;}
+    .conn-head{background:var(--lc-bg-surface);padding:10px 18px;
+               display:flex;align-items:center;gap:8px;
+               border-bottom:.5px solid var(--lc-border);
+               font-size:11px;font-weight:600;letter-spacing:.06em;
+               text-transform:uppercase;color:var(--lc-text-secondary);}
+    .conn-head svg{width:14px;height:14px;}
+    .conn-row{display:flex;align-items:center;justify-content:space-between;
+              padding:12px 18px;border-bottom:.5px solid var(--lc-border);gap:12px;}
+    .conn-row:last-child{border-bottom:none;}
+    .conn-field{display:flex;align-items:flex-start;gap:10px;flex:1;}
+    .c-dot{width:8px;height:8px;border-radius:50%;background:var(--lc-neutral-bg);
+           flex-shrink:0;margin-top:5px;border:1.5px solid #ccc;}
+    .conn-lbl{font-size:13px;font-weight:500;}
+    .conn-hint{font-size:11px;color:var(--lc-text-secondary);
+               font-family:var(--lc-font-mono);margin-top:3px;}
+    .conn-st{font-size:11px;font-weight:500;padding:3px 9px;
+             border-radius:var(--r-pill);white-space:nowrap;flex-shrink:0;}
+    .st-pend{background:var(--lc-neutral-bg);color:var(--lc-neutral-text);}
+
+    /* CODE */
+    code{font-family:var(--lc-font-mono);font-size:11px;
+         background:var(--lc-info-bg);color:var(--lc-info-text);
+         padding:2px 6px;border-radius:4px;}
+    pre{font-family:var(--lc-font-mono);font-size:11px;line-height:1.6;
+        background:var(--lc-bg-surface);border-radius:var(--r-sm);
+        padding:12px 14px;margin-top:8px;overflow-x:auto;
+        color:var(--lc-text-primary);border:.5px solid var(--lc-border);}
+
+    /* FOOTER */
+    .app-foot{background:var(--lc-bg-card);border-top:.5px solid var(--lc-border);padding:12px 28px;}
+    .foot-in{display:flex;align-items:center;justify-content:space-between;}
+    .foot-cp{font-size:11px;color:var(--lc-text-secondary);}
+    .foot-ver{font-size:11px;color:var(--lc-text-secondary);
+              background:var(--lc-bg-surface);padding:3px 8px;border-radius:var(--r-pill);}
+
+    /* UTILS */
+    .mb-lg{margin-bottom:16px;} .mt-xl{margin-top:24px;}
+
+    /* ANIMATION */
+    .view{animation:fi .2s ease;}
+    @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+    /* OVERLAY */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;}
+
+    /* MODULE ICON (grande, en cabecera de módulo) */
+    .mc-icon.lg{width:50px;height:50px;margin:0;}
+    .mc-icon.lg svg{width:24px;height:24px;}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){.mod-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%);width:var(--sw) !important;}
+      .sidebar.mobile-open{transform:translateX(0);}
+      .main{margin-left:0 !important;}
+      .wz{padding:16px;}
+      .mod-grid{grid-template-columns:1fr;}
+      .conn-row{flex-direction:column;align-items:flex-start;}
+      .overlay{display:block !important;}
+      .lc-table thead{display:none;}
+      .lc-table,.lc-table tbody,.lc-table tr,.lc-table td{display:block;width:100%;}
+      .lc-table tr{margin-bottom:8px;border:.5px solid var(--lc-border);border-radius:var(--r-md);padding:8px;}
+      .lc-table td{padding:5px 8px;border-bottom:none;}
+      .lc-table td::before{content:attr(data-label)": ";font-weight:600;font-size:11px;
+                            color:var(--lc-text-secondary);text-transform:uppercase;}
+    }
+    @media(max-width:480px){.mod-grid{grid-template-columns:1fr;}}
+
+    /* ═══ LOGIN OVERLAY ═══════════════════════════════════════════════ */
+    #login-overlay {
+      position:fixed; inset:0;
+      background:rgba(10,20,35,0.96);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999;
+    }
+    .login-card {
+      background:var(--lc-bg-card);
+      border-radius:var(--r-lg);
+      padding:40px 36px 32px;
+      width:360px;
+      box-shadow:0 16px 48px rgba(0,0,0,.35);
+      border:.5px solid var(--lc-border);
+    }
+    .login-logo {
+      width:44px; height:44px;
+      background:var(--lc-secondary);
+      border-radius:var(--r-md);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:20px;
+    }
+    .login-logo svg { width:22px; height:22px; fill:#fff; }
+    .login-title { font-size:18px; font-weight:600; margin-bottom:4px; }
+    .login-sub   { font-size:12px; color:var(--lc-text-secondary); margin-bottom:28px; }
+    .lc-label    { font-size:11px; font-weight:500; color:var(--lc-text-secondary);
+                   text-transform:uppercase; letter-spacing:.07em; margin-bottom:5px; display:block; }
+    .lc-field    { margin-bottom:16px; }
+    .lc-input {
+      width:100%; padding:10px 13px;
+      border:1px solid var(--lc-border-strong, rgba(0,0,0,.22));
+      border-radius:var(--r-md);
+      font-family:var(--lc-font-sans); font-size:13px;
+      color:var(--lc-text-primary);
+      background:var(--lc-bg-page);
+      outline:none; transition:border-color .15s, box-shadow .15s;
+      box-sizing:border-box;
+    }
+    .lc-input:focus {
+      border-color:var(--lc-primary);
+      box-shadow:0 0 0 3px rgba(38,149,208,0.18);
+    }
+    .login-btn {
+      width:100%; padding:11px;
+      background:var(--lc-primary); color:#fff;
+      border:none; border-radius:var(--r-md);
+      font-family:var(--lc-font-sans); font-size:13px; font-weight:500;
+      cursor:pointer; transition:background .15s;
+      margin-top:4px;
+    }
+    .login-btn:hover { background:var(--lc-primary-dark); }
+    .login-btn:disabled { opacity:.6; cursor:default; }
+    .login-err {
+      margin-top:12px; font-size:12px;
+      color:var(--lc-secondary);
+      background:rgba(202,73,78,.08);
+      border-radius:var(--r-sm);
+      padding:8px 12px; display:none;
+    }
+    .login-footer {
+      margin-top:28px; font-size:11px;
+      color:var(--lc-text-secondary);
+      text-align:center;
+    }
+    /* Badge de usuario en el header */
+    .user-badge {
+      display:inline-flex; align-items:center; gap:7px;
+      background:rgba(255,255,255,.08);
+      border:.5px solid rgba(255,255,255,.14);
+      border-radius:var(--r-pill);
+      padding:4px 12px;
+      font-size:11px; color:rgba(255,255,255,.75);
+    }
+    .user-role {
+      font-size:10px;
+      padding:2px 7px; border-radius:var(--r-pill);
+      font-weight:500;
+    }
+    .role-admin  { background:rgba(202,73,78,.25);  color:#f08080; }
+    .role-editor { background:rgba(38,149,208,.25); color:#7ec4e8; }
+    .role-lector { background:rgba(255,255,255,.12);color:rgba(255,255,255,.55); }
+
+  </style>
+</head>
+<body>
+
+
+<!-- ════ LOGIN OVERLAY ════ -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><path d="M9 2a1 1 0 000 2h6a1 1 0 000-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 000-2H7zm3 0a1 1 0 000 2h5a1 1 0 000-2h-5zM7 13a1 1 0 000 2h.01a1 1 0 000-2H7zm3 0a1 1 0 000 2h5a1 1 0 000-2h-5z"/></svg>
+    </div>
+    <div class="login-title">Laboratorio Chavira</div>
+    <div class="login-sub">Sistema de Gestión de Calidad · ERP v1.0</div>
+
+    <div class="lc-field">
+      <label class="lc-label" for="inp-user">Usuario</label>
+      <input id="inp-user" class="lc-input" type="text"
+             placeholder="Escribe tu usuario"
+             autocomplete="username"
+             onkeydown="if(event.key==='Enter')document.getElementById('inp-pass').focus()"/>
+    </div>
+    <div class="lc-field">
+      <label class="lc-label" for="inp-pass">Contraseña</label>
+      <input id="inp-pass" class="lc-input" type="password"
+             placeholder="Escribe tu contraseña"
+             autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Iniciar sesión</button>
+    <div class="login-err" id="login-err"></div>
+
+    <div class="login-footer">¿Olvidaste tu contraseña? Contacta al administrador del sistema.</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logoicon">
+      <svg viewBox="0 0 24 24"><path d="M9 2a1 1 0 000 2h6a1 1 0 000-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h6a3 3 0 003-3 2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 000-2H7zm3 0a1 1 0 000 2h5a1 1 0 000-2h-5zM7 13a1 1 0 000 2h.01a1 1 0 000-2H7zm3 0a1 1 0 000 2h5a1 1 0 000-2h-5z"/></svg>
+    </div>
+    <div class="sb-logotxt">
+      <div class="name">Laboratorio Chavira</div>
+      <div class="sub">SGC · ERP v1.0</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Principal</div>
+    <button class="nav-item active" onclick="go('dashboard',this)">
+      <span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg></span>
+      <span class="sb-lbl">Dashboard</span>
+    </button>
+    <div class="sb-sec">Módulos SGC</div>
+    <button class="nav-item" onclick="go('capital_humano',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg></span><span class="sb-lbl">Capital Humano</span></button>
+    <button class="nav-item" onclick="go('compras',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></span><span class="sb-lbl">Compras</span></button>
+    <button class="nav-item" onclick="go('almacen',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Almacén</span></button>
+    <button class="nav-item" onclick="go('mantenimiento',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Mantenimiento</span></button>
+    <div class="sb-sec">Financiero</div>
+    <button class="nav-item" onclick="go('cuentas_pagar',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Cuentas por Pagar</span></button>
+    <button class="nav-item" onclick="go('cuentas_cobrar',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Cuentas por Cobrar</span></button>
+    <button class="nav-item" onclick="go('caja',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 000 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Gestión de Caja</span></button>
+    <button class="nav-item" onclick="go('presupuestal',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Presupuestal</span></button>
+  </nav>
+      <div class="sb-sec">Sistema</div>
+    <button class="nav-item" onclick="go('accesos',this)"><span class="nav-icon"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg></span><span class="sb-lbl">Accesos</span></button>
+  <div class="sb-foot">SGC © 2026 · Laboratorio Chavira</div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<div class="main" id="main">
+  <header class="hdr">
+    <div class="hdr-inner">
+      <div class="hdr-left">
+        <button class="tog-btn" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <nav class="bc">
+          <span class="bc-item">SGC</span>
+          <span class="bc-sep">›</span>
+          <span class="bc-active" id="bcActive">Dashboard</span>
+        </nav>
+      </div>
+      <div class="hdr-right">
+        <span id="hdr-user-area"><span class="hdr-badge"><span class="hdr-dot"></span><span id="hdrDate"></span></span></span>
+      </div>
+    </div>
+  </header>
+  <main class="wz" id="wz"></main>
+  <footer class="app-foot">
+    <div class="foot-in">
+      <span class="foot-cp">Laboratorio Chavira · Sistema de Gestión de Calidad</span>
+      <span class="foot-ver">ERP v1.0 · 2026</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ════ TEMPLATES DE MÓDULOS ════ -->
+
+<template id="tpl-capital_humano">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Capital Humano</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Gestión del talento y ciclo de vida del colaborador</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-capital_humano">
+      <button class="tab active" onclick="swTab('capital_humano','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('capital_humano','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-capital_humano-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1K5QAgxqY46ge-FrFu3k3iiDDE7ht5AOizfa2eI1oa3Y/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Reclutamiento y selección de personal ↗</a></div><div class="proc-desc">Atracción, evaluación y contratación conforme al perfil de puesto.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/198-C4QVqU8Fe-pSkVeCbVXY-Dmn0bKUS-Aq6BjwKYRo/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Inducción y Capacitación ↗</a></div><div class="proc-desc">Integración del colaborador: presentación institucional, formación técnica y evaluación.</div></div></div><div class="proc"><div class="proc-num">3</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1vzMZlESMMd08zqfzSNXtXqa9SFVBq21MASHHC-tKBJE/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Evaluación del desempeño ↗</a></div><div class="proc-desc">Evaluación periódica de competencias.</div></div></div><div class="proc"><div class="proc-num">4</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1kQN9H8G6J-mYgTPyN35-_AbbIAdYPwCesUM2Y7-z690/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Baja de personal ↗</a></div><div class="proc-desc">Desvinculación: liquidación, entrega de activos, revocación de accesos y encuesta de salida.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Solicitud de personal</strong></td><td data-label="Descripción">Requisición de nueva plaza o reemplazo</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbyITR8RyZa-qz59ywkG-iMFm7vjGLRCuPKMsMbPy2y1mCdTms_tAhzr2fhKWkAdsfhj/exec" class="btn btn-outline btn-sm" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Encuesta de retroalimentación de inducción</strong></td><td data-label="Descripción">Mide la efectividad del proceso de inducción</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycby99cxxEOjpPdbysyUyYhEidql0TrHR5gx3znvqF6GhuaF7Cayq31lZL8YpnfxNPTxE/exec" class="btn btn-outline btn-sm" data-form-key="ch_induccion" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Perfiles de puesto</strong></td><td data-label="Descripción">Competencias, funciones y requisitos por cargo</td><td data-label="Acceso"><a href="https://docs.google.com/spreadsheets/d/1tBptnOusDyz9OpJV8m1bMGo7W7Us1Wu3nYzpRESLMos/edit?gid=0#gid=0" class="btn btn-outline btn-sm" data-form-key="ch_perfil" target="_blank">Abrir ↗</a></td></tr><tr><tr><td data-label="Nombre"><strong>Programa de Capacitación</strong></td><td data-label="Descripción">Calendario, responsables y evidencia de cursos</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=ch_programa" class="btn btn-outline btn-sm" data-form-key="ch_programa" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Evaluación del desempeño del personal</strong></td><td data-label="Descripción">Formulario de evaluación 360°</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbwcI6Zk7CPiCHQroQ0TdUbKcgeB09YBXXpgjLKDumaam6qkr2DF_-T_zuJOj5KTNRhT/exec" class="btn btn-outline btn-sm" data-form-key="ch_evaluacion" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Encuesta de salida</strong></td><td data-label="Descripción">Retroalimentación al término de la relación laboral</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbzxiUB8Uwen0mEdC27bhn97mjOlj6LHA0gx7jnds7UX_mzK6heUaAp5Mce7gWu3EGbjvA/exec" class="btn btn-outline btn-sm" data-form-key="ch_salida" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Encuesta de clima organizacional</strong></td><td data-label="Descripción">Medición anual de satisfacción y ambiente laboral</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbwrNdQFY3IdZCP0ZdNRXBbhyiB2hvJCKUa9CGGPQVSdYf2xRf0DNM8hkG_1S-FqgaPh9g/exec" class="btn btn-outline btn-sm" data-form-key="ch_clima" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-capital_humano-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 7 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Solicitud de personal</div><div class="fi-desc">Requisición de nueva plaza o reemplazo</div></div></div><a href="https://script.google.com/macros/s/AKfycbyITR8RyZa-qz59ywkG-iMFm7vjGLRCuPKMsMbPy2y1mCdTms_tAhzr2fhKWkAdsfhj/exec" class="btn btn-primary btn-sm" data-form-key="ch_solicitud_personal" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Encuesta de retroalimentación de inducción</div><div class="fi-desc">Mide la efectividad del proceso de inducción</div></div></div><a href="https://script.google.com/macros/s/AKfycby99cxxEOjpPdbysyUyYhEidql0TrHR5gx3znvqF6GhuaF7Cayq31lZL8YpnfxNPTxE/exec" class="btn btn-primary btn-sm" data-form-key="ch_induccion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Perfiles de puesto</div><div class="fi-desc">Competencias, funciones y requisitos por cargo</div></div></div><a href="https://docs.google.com/spreadsheets/d/1tBptnOusDyz9OpJV8m1bMGo7W7Us1Wu3nYzpRESLMos/edit?usp=drive_web&ouid=101382378043357357222" class="btn btn-primary btn-sm" data-form-key="ch_perfil" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Programa de Capacitación</div><div class="fi-desc">Calendario, responsables y evidencia de cursos</div></div></div><a href="<?= getScriptUrl(); ?>?p=ch_programa" class="btn btn-primary btn-sm" data-form-key="ch_programa" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Evaluación del desempeño del personal</div><div class="fi-desc">Formulario de evaluación 360°</div></div></div><a href="https://script.google.com/macros/s/AKfycbwcI6Zk7CPiCHQroQ0TdUbKcgeB09YBXXpgjLKDumaam6qkr2DF_-T_zuJOj5KTNRhT/exec" class="btn btn-primary btn-sm" data-form-key="ch_evaluacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Encuesta de salida</div><div class="fi-desc">Retroalimentación al término de la relación laboral</div></div></div><a href="https://script.google.com/macros/s/AKfycbzxiUB8Uwen0mEdC27bhn97mjOlj6LHA0gx7jnds7UX_mzK6heUaAp5Mce7gWu3EGbjvA/exec" class="btn btn-primary btn-sm" data-form-key="ch_salida" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Encuesta de clima organizacional</div><div class="fi-desc">Medición anual de satisfacción y ambiente laboral</div></div></div><a href="https://script.google.com/macros/s/AKfycbwrNdQFY3IdZCP0ZdNRXBbhyiB2hvJCKUa9CGGPQVSdYf2xRf0DNM8hkG_1S-FqgaPh9g/exec" class="btn btn-primary btn-sm" data-form-key="ch_clima" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;">
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-compras">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Compras</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Adquisiciones y gestión de proveedores</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-compras">
+      <button class="tab active" onclick="swTab('compras','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('compras','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-compras-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1I8yQekU9ta4C0B_j20N2HqxMsJcgyWCAv7UuKIc2l64/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Selección, Evaluación y Reevaluación de Proveedores ↗</a></div><div class="proc-desc">Alta de proveedor: validación fiscal, evaluación de capacidad y seguimiento periódico.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1Vo9GfYaZ5B_Al1Yxa8Zcucy3Or_4Yt6Kdudvk7QfI5c/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Gestión de compras y adquisiciones ↗</a></div><div class="proc-desc">Ciclo completo: requisición, cotización, autorización, OC y confirmación de recepción.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Solicitud de compra</strong></td><td data-label="Descripción">Requisición interna de bienes o servicios</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbyJafv-p4xXahjzpt3VzKgdvF2X6XsQMhI9QZAksz7-UX_6ZO5lozUerKcGkCW20k8P/exec" class="btn btn-outline btn-sm" data-form-key="co_solicitud" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Orden de compra</strong></td><td data-label="Descripción">Documento formal con condiciones comerciales</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbw5u8z8HxJ9GAzU5DfMTiQMoIroXKNqYoO7JXlURAR7l72FTolOUe6BZw4M41euXWHbuQ/exec" class="btn btn-outline btn-sm" data-form-key="co_orden" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Catálogo de proveedores autorizados</strong></td><td data-label="Descripción">Registro de proveedores calificados y vigentes</td><td data-label="Acceso"><a href="https://docs.google.com/spreadsheets/d/1PpW50uhEGCU8T__fTwKWZ2liVbDdc2iCFv-XvmvUzEU/edit?gid=333067314#gid=333067314" class="btn btn-outline btn-sm" data-form-key="co_catalogo" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Evaluación y reevaluación de proveedores</strong></td><td data-label="Descripción">Calificación por calidad, precio y cumplimiento</td><td data-label="Acceso"><a href="https://script.google.com/macros/s/AKfycbzCNJmH8FbD8Lm1SJwVKSDhDfOGuhVuaH0M8ctOG_Dt2S9u3a4qE2Tod8kvAmHDW06pdg/exec" class="btn btn-outline btn-sm" data-form-key="co_evaluacion" target="_blank">Abrir ↗</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-compras-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 4 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Solicitud de compra</div><div class="fi-desc">Requisición interna de bienes o servicios</div></div></div><a href="https://script.google.com/macros/s/AKfycbyJafv-p4xXahjzpt3VzKgdvF2X6XsQMhI9QZAksz7-UX_6ZO5lozUerKcGkCW20k8P/exec" class="btn btn-primary btn-sm" data-form-key="co_solicitud" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Orden de compra</div><div class="fi-desc">Documento formal con condiciones comerciales</div></div></div><a href="https://script.google.com/macros/s/AKfycbw5u8z8HxJ9GAzU5DfMTiQMoIroXKNqYoO7JXlURAR7l72FTolOUe6BZw4M41euXWHbuQ/exec" class="btn btn-primary btn-sm" data-form-key="co_orden" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Catálogo de proveedores autorizados</div><div class="fi-desc">Registro de proveedores calificados y vigentes</div></div></div><a href="https://docs.google.com/spreadsheets/d/1PpW50uhEGCU8T__fTwKWZ2liVbDdc2iCFv-XvmvUzEU/edit?gid=333067314#gid=333067314" class="btn btn-primary btn-sm" data-form-key="co_catalogo" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Evaluación y reevaluación de proveedores</div><div class="fi-desc">Calificación por calidad, precio y cumplimiento</div></div></div><a href="https://script.google.com/macros/s/AKfycbzCNJmH8FbD8Lm1SJwVKSDhDfOGuhVuaH0M8ctOG_Dt2S9u3a4qE2Tod8kvAmHDW06pdg/exec" class="btn btn-primary btn-sm" data-form-key="co_evaluacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div></div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-almacen">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Almacén</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Control de suministros, existencias y cadena de frío</div>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs-almacen">
+      <button class="tab active" onclick="swTab('almacen','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('almacen','op',this)">⚡ Operativa</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-almacen-doc">
+      <div class="lc-card"><div class="sec-label">Procedimientos</div>
+        <div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1hFYy2Xjvl4brZ9RczcPIpc8dc731xbLvOW47TKKKWeI/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Recepción e inspección de suministros ↗</a></div><div class="proc-desc">Verificación de cantidad, calidad y condiciones de ingreso de materiales.</div></div></div>
+        <div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1SB9XPC_4XicxlyaFBfCWKJeRBmwSZXoksZdaB_jHh_0/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Almacenamiento y control de existencias ↗</a></div><div class="proc-desc">Gestión PEPS del inventario, Kardex digital y alertas de stock mínimo.</div></div></div>
+        <div class="proc"><div class="proc-num">3</div><div style="flex:1;"><div class="proc-title"><a href="https://docs.google.com/document/d/1IosEDaor1ViL1eobnH2bRZGpscrrzPzq7ZZuAn_j104/edit?tab=t.0" target="_blank" style="color:var(--lc-primary);">Gestión de producto caducado o no conforme ↗</a></div><div class="proc-desc">Identificación, cuarentena, baja y disposición final de producto no apto.</div></div></div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-almacen-op" style="display:none;">
+      <div class="lc-card" style="display:flex;flex-direction:column;align-items:center;padding:48px 24px;gap:20px;text-align:center;">
+        <div class="mc-icon" style="width:56px;height:56px;margin:0;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="26"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Sistema de Almacén</div>
+          <div style="font-size:12px;color:var(--lc-text-secondary);max-width:340px;line-height:1.6;">El registro operativo de Almacén se gestiona a través de la aplicación dedicada. Haz clic en el botón para acceder.</div>
+        </div>
+        <a href="#" class="btn btn-primary" style="padding:11px 28px;font-size:13px;" target="_blank">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="15"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+          App Almacén
+        </a>
+        <div style="font-size:11px;color:var(--lc-text-secondary);">Cuando la app esté lista, reemplaza el <code>href="#"</code> del botón por la URL real.</div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<template id="tpl-mantenimiento">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Mantenimiento</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Gestión de equipos, calibración e infraestructura</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-mantenimiento">
+      <button class="tab active" onclick="swTab('mantenimiento','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('mantenimiento','op',this)">⚡ Operativa</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-mantenimiento-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title">Mantenimiento preventivo y correctivo</div><div class="proc-desc">Ejecución del programa anual preventivo y atención de fallas correctivas.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title">Calibración y Metrología</div><div class="proc-desc">Programa de calibración con trazabilidad metrológica acreditada.</div></div></div><div class="proc"><div class="proc-num">3</div><div style="flex:1;"><div class="proc-title">Gestión de Infraestructura</div><div class="proc-desc">Mantenimiento de instalaciones físicas, servicios generales y activos fijos.</div></div></div></div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-mantenimiento-op" style="display:none;">
+      <div class="lc-card" style="display:flex;flex-direction:column;align-items:center;padding:48px 24px;gap:20px;text-align:center;">
+        <div class="mc-icon" style="width:56px;height:56px;margin:0;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="26"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:6px;">Sistema de Mantenimiento</div>
+          <div style="font-size:12px;color:var(--lc-text-secondary);max-width:340px;line-height:1.6;">El registro operativo de Mantenimiento se gestiona a través de la aplicación dedicada. Haz clic en el botón para acceder.</div>
+        </div>
+        <a href="https://script.google.com/macros/s/AKfycbyIlFBTBwoQbelr7RqDBoRemDwqgU4iWsartglQm8bAD10SGfF3dj2WeChxNG41VY906w/exec" class="btn btn-primary" style="padding:11px 28px;font-size:13px;" target="_blank">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="15"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+          App Mantenimiento
+        </a>    
+      </div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-cuentas_pagar">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Cuentas por Pagar</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Validación de comprobantes y programación de egresos</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-cuentas_pagar">
+      <button class="tab active" onclick="swTab('cuentas_pagar','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('cuentas_pagar','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-cuentas_pagar-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title">Recepción y validación de comprobantes fiscales</div><div class="proc-desc">Revisión de CFDI: XML, sello PAC, datos fiscales y conceptos vs. orden de compra.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title">Programación y ejecución de pagos</div><div class="proc-desc">Autorización por nivel, programación por vencimiento y registro en conciliación bancaria.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Recepción y Validación de Facturas</strong></td><td data-label="Descripción">Checklist de revisión de CFDI digitales</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cpag_validacion" class="btn btn-outline btn-sm" data-form-key="cpag_validacion" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Programación de Pagos</strong></td><td data-label="Descripción">Calendario de pagos por proveedor y fecha de vencimiento</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cpag_programacion" class="btn btn-outline btn-sm" data-form-key="cpag_programacion" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Autorización de Pago</strong></td><td data-label="Descripción">Formato de aprobación con firmas autorizadas por nivel</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cpag_autorizacion" class="btn btn-outline btn-sm" data-form-key="cpag_autorizacion" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Conciliación de Estado de Cuenta de Proveedores</strong></td><td data-label="Descripción">Cruce de movimientos bancarios vs. registros internos</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cpag_conciliacion" class="btn btn-outline btn-sm" data-form-key="cpag_conciliacion" target="_blank">Abrir ↗</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-cuentas_pagar-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 4 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Recepción y Validación de Facturas</div><div class="fi-desc">Checklist de revisión de CFDI digitales</div></div></div><a href="<?= getScriptUrl(); ?>?p=cpag_validacion" class="btn btn-primary btn-sm" data-form-key="cpag_validacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Programación de Pagos</div><div class="fi-desc">Calendario de pagos por proveedor y fecha de vencimiento</div></div></div><a href="<?= getScriptUrl(); ?>?p=cpag_programacion" class="btn btn-primary btn-sm" data-form-key="cpag_programacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Autorización de Pago</div><div class="fi-desc">Formato de aprobación con firmas autorizadas por nivel</div></div></div><a href="<?= getScriptUrl(); ?>?p=cpag_autorizacion" class="btn btn-primary btn-sm" data-form-key="cpag_autorizacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Conciliación de Estado de Cuenta de Proveedores</div><div class="fi-desc">Cruce de movimientos bancarios vs. registros internos</div></div></div><a href="<?= getScriptUrl(); ?>?p=cpag_conciliacion" class="btn btn-primary btn-sm" data-form-key="cpag_conciliacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div></div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-cuentas_cobrar">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Cuentas por Cobrar</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Facturación CFDI, cobranza y conciliación de ingresos</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-cuentas_cobrar">
+      <button class="tab active" onclick="swTab('cuentas_cobrar','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('cuentas_cobrar','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-cuentas_cobrar-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title">Facturación y Emisión de CFDI</div><div class="proc-desc">Generación de facturas electrónicas timbradas conforme a normativa vigente del SAT.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title">Gestión de Cobranza y Seguimiento de Cartera</div><div class="proc-desc">Contacto proactivo con clientes, acuerdos de pago y control de antigüedad de saldos.</div></div></div><div class="proc"><div class="proc-num">3</div><div style="flex:1;"><div class="proc-title">Conciliación de Ingresos</div><div class="proc-desc">Cruce de depósitos bancarios, CFDI emitidos y complementos de pago recibidos.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Catálogo de Clientes y Condiciones de Crédito</strong></td><td data-label="Descripción">Datos fiscales, límites y plazos de crédito por cliente</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=ccob_catalogo" class="btn btn-outline btn-sm" data-form-key="ccob_catalogo" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Reporte de Cartera Vencida (Antigüedad de Saldos)</strong></td><td data-label="Descripción">Concentrado de saldos por antigüedad y cliente</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=ccob_antiguedad" class="btn btn-outline btn-sm" data-form-key="ccob_antiguedad" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Recibo de Pago / Complemento de Recepción de Pagos</strong></td><td data-label="Descripción">CFDI complemento de pago y acuse de recibo</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=ccob_recibo" class="btn btn-outline btn-sm" data-form-key="ccob_recibo" target="_blank">Abrir ↗</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-cuentas_cobrar-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 3 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Catálogo de Clientes y Condiciones de Crédito</div><div class="fi-desc">Datos fiscales, límites y plazos de crédito por cliente</div></div></div><a href="<?= getScriptUrl(); ?>?p=ccob_catalogo" class="btn btn-primary btn-sm" data-form-key="ccob_catalogo" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Reporte de Cartera Vencida (Antigüedad de Saldos)</div><div class="fi-desc">Concentrado de saldos por antigüedad y cliente</div></div></div><a href="<?= getScriptUrl(); ?>?p=ccob_antiguedad" class="btn btn-primary btn-sm" data-form-key="ccob_antiguedad" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Recibo de Pago / Complemento de Recepción de Pagos</div><div class="fi-desc">CFDI complemento de pago y acuse de recibo</div></div></div><a href="<?= getScriptUrl(); ?>?p=ccob_recibo" class="btn btn-primary btn-sm" data-form-key="ccob_recibo" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div></div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-caja">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 000 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Gestión de Caja</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Arqueo de caja, caja chica y conciliación bancaria</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-caja">
+      <button class="tab active" onclick="swTab('caja','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('caja','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-caja-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title">Corte y Arqueo de Caja</div><div class="proc-desc">Conteo físico de efectivo al cierre de turno, cruce con sistema y reporte de diferencias.</div></div></div><div class="proc"><div class="proc-num">2</div><div style="flex:1;"><div class="proc-title">Gestión de Caja Chica</div><div class="proc-desc">Manejo del fondo fijo: entrega de vales, comprobación de gastos y reposición del fondo.</div></div></div><div class="proc"><div class="proc-num">3</div><div style="flex:1;"><div class="proc-title">Conciliación Bancaria</div><div class="proc-desc">Cruce mensual de estados de cuenta bancarios contra registros contables del período.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Formato de Arqueo de Caja Diario</strong></td><td data-label="Descripción">Registro del conteo físico y cuadre de turno</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cj_arqueo" class="btn btn-outline btn-sm" data-form-key="cj_arqueo" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Vale de Caja Chica</strong></td><td data-label="Descripción">Comprobante de gasto menor con descripción y soporte fiscal</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cj_vale" class="btn btn-outline btn-sm" data-form-key="cj_vale" target="_blank">Abrir ↗</a></td></tr><tr><td data-label="Nombre"><strong>Reposición de Fondo Fijo</strong></td><td data-label="Descripción">Solicitud de reposición del fondo de caja chica</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=cj_reposicion" class="btn btn-outline btn-sm" data-form-key="cj_reposicion" target="_blank">Abrir ↗</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-caja-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 3 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Formato de Arqueo de Caja Diario</div><div class="fi-desc">Registro del conteo físico y cuadre de turno</div></div></div><a href="<?= getScriptUrl(); ?>?p=cj_arqueo" class="btn btn-primary btn-sm" data-form-key="cj_arqueo" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Vale de Caja Chica</div><div class="fi-desc">Comprobante de gasto menor con descripción y soporte fiscal</div></div></div><a href="<?= getScriptUrl(); ?>?p=cj_vale" class="btn btn-primary btn-sm" data-form-key="cj_vale" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Reposición de Fondo Fijo</div><div class="fi-desc">Solicitud de reposición del fondo de caja chica</div></div></div><a href="<?= getScriptUrl(); ?>?p=cj_reposicion" class="btn btn-primary btn-sm" data-form-key="cj_reposicion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div></div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<template id="tpl-presupuestal">
+  <div class="view">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+      <div class="mc-icon" style="margin:0;width:50px;height:50px;"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg></div>
+      <div>
+        <div style="font-size:22px;font-weight:600;">Gestión Presupuestal</div>
+        <div style="font-size:12px;color:var(--lc-text-secondary);">Elaboración, control y análisis de variaciones presupuestales</div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-presupuestal">
+      <button class="tab active" onclick="swTab('presupuestal','doc',this)">📋 Documentación</button>
+      <button class="tab"        onclick="swTab('presupuestal','op',this)">⚡ Operativa / Formatos</button>
+    </div>
+
+    <!-- TAB DOC -->
+    <div id="tab-presupuestal-doc">
+      <div class="lc-card mb-lg"><div class="sec-label">Procedimientos</div><div class="proc"><div class="proc-num">1</div><div style="flex:1;"><div class="proc-title">Elaboración y Control de Presupuestos</div><div class="proc-desc">Formulación del presupuesto anual por centro de costo, seguimiento mensual y gestión de ajustes autorizados.</div></div></div></div>
+      <div class="lc-card"><div class="sec-label">Catálogo de formatos</div>
+        <div class="tbl-wrap" style="border:none;">
+          <table class="lc-table">
+            <thead><tr><th>Nombre</th><th>Descripción</th><th>Acceso</th></tr></thead>
+            <tbody><tr><td data-label="Nombre"><strong>Reporte de Variación Presupuestal</strong></td><td data-label="Descripción">Concentrado de presupuestado vs. ejercido con análisis de desviaciones por rubro</td><td data-label="Acceso"><a href="<?= getScriptUrl(); ?>?p=pb_variacion" class="btn btn-outline btn-sm" data-form-key="pb_variacion" target="_blank">Abrir ↗</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB OP -->
+    <div id="tab-presupuestal-op" style="display:none;">
+      <div class="alert a-info mb-lg"><span class="a-dot"></span>
+        <span>Los formularios se abren en Google Forms integrado al SGC. Cada respuesta queda registrada automáticamente en la hoja del módulo.</span>
+      </div>
+      <div class="lc-card"><div class="sec-label">Formularios operativos — 1 formatos</div><div class="fi"><div style="display:flex;align-items:center;gap:12px;flex:1;"><div class="fi-ico"><svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div><div><div class="fi-name">Reporte de Variación Presupuestal</div><div class="fi-desc">Concentrado de presupuestado vs. ejercido con análisis de desviaciones por rubro</div></div></div><a href="<?= getScriptUrl(); ?>?p=pb_variacion" class="btn btn-primary btn-sm" data-form-key="pb_variacion" target="_blank"><svg viewBox="0 0 20 20" fill="currentColor" width="13"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg> Abrir</a></div></div>
+    </div>
+
+    <!-- TAB CONN --></div>
+</template>
+
+<script>
+/* ── DATOS DEL DASHBOARD ─────────────────────────────────────────────── */
+var MDATA = {
+  capital_humano:{id:"capital_humano",title:"Capital Humano",subtitle:"Gestión del talento y ciclo de vida del colaborador",procs:4,forms:9,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>'},
+  compras:{id:"compras",title:"Compras",subtitle:"Adquisiciones y gestión de proveedores",procs:2,forms:4,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>'},
+  almacen:{id:"almacen",title:"Almacén",subtitle:"Control de suministros, existencias y cadena de frío",procs:3,forms:5,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>'},
+  mantenimiento:{id:"mantenimiento",title:"Mantenimiento",subtitle:"Gestión de equipos, calibración e infraestructura",procs:3,forms:4,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>'},
+  cuentas_pagar:{id:"cuentas_pagar",title:"Cuentas por Pagar",subtitle:"Validación de comprobantes y programación de egresos",procs:2,forms:4,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>'},
+  cuentas_cobrar:{id:"cuentas_cobrar",title:"Cuentas por Cobrar",subtitle:"Facturación CFDI, cobranza y conciliación de ingresos",procs:3,forms:3,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg>'},
+  caja:{id:"caja",title:"Gestión de Caja",subtitle:"Arqueo de caja, caja chica y conciliación bancaria",procs:3,forms:3,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 000 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>'},
+  presupuestal:{id:"presupuestal",title:"Gestión Presupuestal",subtitle:"Elaboración, control y análisis de variaciones presupuestales",procs:1,forms:1,icon:'<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>'}
+};
+
+var LABELS = {
+  dashboard:'Dashboard', capital_humano:'Capital Humano', compras:'Compras',
+  almacen:'Almacén', mantenimiento:'Mantenimiento', cuentas_pagar:'Cuentas por Pagar',
+  cuentas_cobrar:'Cuentas por Cobrar', caja:'Gestión de Caja', presupuestal:'Gestión Presupuestal', accesos:'Control de Accesos'
+};
+
+/* ── NAVEGACIÓN ──────────────────────────────────────────────────────── */
+var sbCollapsed = false;
+var curModId    = null;
+
+function go(view, btn) {
+  /* Verificar acceso antes de navegar */
+  if (view !== 'dashboard' && SESSION) {
+    var tieneAcceso = SESSION.modulos === '*' ||
+                      SESSION.modulos.indexOf(view) > -1 ||
+                      view === 'accesos';
+    if (!tieneAcceso) {
+      /* Bloquear silenciosamente — no hace nada */
+      return;
+    }
+  }
+  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  document.getElementById('bcActive').textContent = LABELS[view] || view;
+  curModId = (view === 'dashboard') ? null : view;
+  if (view === 'dashboard') { renderDashboard(); }
+  else { loadModule(view); }
+  if (window.innerWidth < 768) closeSidebar();
+}
+
+/* ── CARGA DE MÓDULO DESDE <template> ───────────────────────────────── */
+function loadModule(id) {
+  var tpl = document.getElementById('tpl-' + id);
+  if (!tpl) {
+    document.getElementById('wz').innerHTML =
+      '<div class="view"><div class="alert a-warning"><span class="a-dot"></span>' +
+      '<span>Módulo <strong>' + id + '</strong> no encontrado.</span></div></div>';
+    return;
+  }
+  var clone = document.importNode(tpl.content, true);
+  var wz = document.getElementById('wz');
+  wz.innerHTML = '';
+  wz.appendChild(clone);
+}
+
+/* ── SWITCH DE TABS (llamado desde dentro del template) ─────────────── */
+function swTab(modId, tabId, btn) {
+  ['doc','op','conn'].forEach(function(t) {
+    var el = document.getElementById('tab-' + modId + '-' + t);
+    if (el) el.style.display = (t === tabId) ? '' : 'none';
+  });
+  var tabsEl = document.getElementById('tabs-' + modId);
+  if (tabsEl) {
+    tabsEl.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
+  }
+  if (btn) btn.classList.add('active');
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
+function toggleSidebar() {
+  var sb = document.getElementById('sidebar');
+  var mn = document.getElementById('main');
+  if (window.innerWidth < 768) {
+    sb.classList.toggle('mobile-open');
+    document.getElementById('overlay').style.display =
+      sb.classList.contains('mobile-open') ? 'block' : 'none';
+  } else {
+    sbCollapsed = !sbCollapsed;
+    sb.classList.toggle('collapsed', sbCollapsed);
+    mn.classList.toggle('expanded', sbCollapsed);
+  }
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('overlay').style.display = 'none';
+}
+
+/* URL helper — en GAS reemplazar con <?= getScriptUrl(); ?>?p=PARAM */
+function gasUrl(p){ return '<?= getScriptUrl(); ?>?p=' + p; }
+
+/* ── DASHBOARD ───────────────────────────────────────────────────────── */
+function renderDashboard() {
+  /* Solo mostrar módulos a los que el usuario tiene acceso */
+  var modVisibles = Object.values(MDATA).filter(function(m) {
+    if (!SESSION) return false;
+    if (SESSION.modulos === '*') return true;
+    return SESSION.modulos.indexOf(m.id) > -1;
+  });
+
+  var cards = modVisibles.map(function(m){
+    return '<div class="mod-card view" onclick="go(\'' + m.id + '\',null)">' +
+      '<div class="mc-icon">' + m.icon + '</div>' +
+      '<div class="mc-title">' + m.title + '</div>' +
+      '<div class="mc-desc">'  + m.subtitle + '</div>' +
+      '<div class="mc-foot">' +
+        '<span class="badge b-info">'    + m.procs + ' procedimientos</span>' +
+        '<span class="badge b-neutral">' + m.forms + ' formatos</span>' +
+      '</div></div>';
+  }).join('');
+
+  document.getElementById('wz').innerHTML =
+    '<div class="view">' +
+      '<p class="pg-title">Sistema de Gestión de Calidad</p>' +
+      '<p class="pg-subtitle">Laboratorio Chavira · Selecciona un módulo para ver sus procedimientos, formatos y conexión a Sheets</p>' +
+      
+      '<div class="sec-label">8 módulos del SGC</div>' +
+      '<div class="mod-grid">' + cards + '</div>' +
+      '<div class="lc-card mt-xl">' +
+        '<div style="font-size:13px;font-weight:600;margin-bottom:12px;">¿Qué contiene cada módulo?</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">' +
+          _leg('📋','Documentación','Procedimientos paso a paso con descripción operativa') +
+          _leg('⚡','Operativa / Formatos','Acceso directo a formularios y apps del proceso') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function _leg(e,t,d){
+  return '<div style="display:flex;gap:10px;align-items:flex-start;">' +
+    '<span style="font-size:18px;line-height:1.2;">' + e + '</span>' +
+    '<div><div style="font-size:12px;font-weight:600;">' + t + '</div>' +
+    '<div style="font-size:11px;color:var(--lc-text-secondary);margin-top:2px;">' + d + '</div></div>' +
+  '</div>';
+}
+
+
+/* ── TABLA DE PERMISOS (Módulo Accesos) ──────────────────────────── */
+var PERM_DATA = [
+  {mod:'Capital Humano',  lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Compras',         lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Almacén',         lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Mantenimiento',   lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Cuentas por Pagar',lector:[1,0,0],editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Cuentas por Cobrar',lector:[1,0,0],editor:[1,1,0],admin:[1,1,1]},
+  {mod:'Gestión de Caja', lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Presupuestal',    lector:[1,0,0], editor:[1,1,0], admin:[1,1,1]},
+  {mod:'Accesos',         lector:[0,0,0], editor:[0,0,0], admin:[1,1,1]},
+];
+
+function buildPermTable() {
+  var tbody = document.getElementById('perm-table-body');
+  if (!tbody) return;
+  var icons = ['👁','✏️','🛡'];
+  var cells = ['Ver','Registrar','Configurar'];
+  var CHECK = '✅'; var CROSS = '—';
+  tbody.innerHTML = PERM_DATA.map(function(row){
+    function cell(arr){
+      return arr.map(function(v,i){
+        return '<span title="'+cells[i]+'" style="margin-right:4px;">'+(v?CHECK:CROSS)+'</span>';
+      }).join('');
+    }
+    return '<tr><td><strong>'+row.mod+'</strong></td>'+
+      '<td style="text-align:center;">'+cell(row.lector)+'</td>'+
+      '<td style="text-align:center;">'+cell(row.editor)+'</td>'+
+      '<td style="text-align:center;">'+cell(row.admin)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+// Hook into go() to build table when module loads
+var _origGo = go;
+go = function(view, btn) {
+  _origGo(view, btn);
+  if (view === 'accesos') { setTimeout(buildPermTable, 50); }
+};
+
+
+
+/* ════════════════════════════════════════════════════════════════════
+   MÓDULO DE ACCESOS
+   ════════════════════════════════════════════════════════════════════
+   INSTRUCCIONES PARA EL ADMINISTRADOR
+   ────────────────────────────────────────────────────────────────────
+   Cada puesto tiene su usuario y contraseña.
+   Para cambiar una contraseña: edita el campo password.
+   Para desactivar un usuario: cambia activo a false.
+
+   ROLES:
+     admin   → acceso total, ve módulo de Accesos
+     editor  → acceso según permisos de su puesto
+     lector  → solo ve procedimientos, no puede registrar nada
+
+   modulos: '*' = todos los módulos (sidebar visible completo)
+   ════════════════════════════════════════════════════════════════════ */
+
+var USUARIOS = [
+  {
+    usuario:  'admin',
+    password: 'Admin2026!',
+    nombre:   'Administrador del Sistema',
+    puesto:   'admin',
+    rol:      'admin',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'director',
+    password: 'Director2026',
+    nombre:   'Director General',
+    puesto:   'director_general',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'coord_admin',
+    password: 'CoordAdmin2026',
+    nombre:   'Coordinación Administrativa',
+    puesto:   'coord_admin',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'coord_lab',
+    password: 'CoordLab2026',
+    nombre:   'Coordinación Laboratorio',
+    puesto:   'coord_lab',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'quimico',
+    password: 'Quimico2026',
+    nombre:   'Químico Analista',
+    puesto:   'quimico_analista',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'mensajero',
+    password: 'Mensajero2026',
+    nombre:   'Mensajero',
+    puesto:   'mensajero',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+  {
+    usuario:  'limpieza',
+    password: 'Limpieza2026',
+    nombre:   'Personal de Limpieza',
+    puesto:   'limpieza',
+    rol:      'editor',
+    modulos:  '*',
+    activo:   true
+  },
+];
+
+/* ── Permisos por ROL (nivel general) ───────────────────────────────
+   Estos son los permisos base. Los permisos FINOS por formato
+   se controlan en PERMISOS_FORMATO abajo.
+   ─────────────────────────────────────────────────────────────────── */
+var PERMISOS = {
+  admin:  { ver: true, registrar: true,  configurar: true  },
+  editor: { ver: true, registrar: true,  configurar: false },
+  lector: { ver: true, registrar: false, configurar: false },
+};
+
+/* ── Permisos finos por PUESTO y FORMATO ────────────────────────────
+   true  = puede REGISTRAR (el botón está activo)
+   false = solo LECTURA    (el botón aparece deshabilitado)
+
+   Clave del formato = atributo data-form-key en cada botón del módulo.
+   ─────────────────────────────────────────────────────────────────── */
+var PERMISOS_FORMATO = {
+
+  director_general: {
+    // Capital Humano
+    'ch_solicitud_personal':           true,
+    'ch_induccion':                    false,
+    'ch_perfil':                       true,
+    'ch_dnc':                          true,
+    'ch_programa':                     true,
+    'ch_evaluacion':                   true,
+    'ch_salida':                       false,
+    'ch_clima':                        true,
+    'ch_incidencias':                  false,
+    // Compras
+    'co_solicitud':                    true,
+    'co_orden':                        false,
+    'co_catalogo':                     true,
+    'co_evaluacion':                   false,
+    // Almacén — sin formatos (sistema externo)
+    // Mantenimiento
+    'mn_programa':                     true,
+    'mn_ot':                           true,
+    'mn_calibracion':                  true,
+    'mn_bitacora':                     false,
+    // Cuentas por Pagar
+    'cpag_validacion':                 true,
+    'cpag_programacion':               true,
+    'cpag_autorizacion':               true,
+    'cpag_conciliacion':               false,
+    // Cuentas por Cobrar
+    'ccob_catalogo':                   true,
+    'ccob_antiguedad':                 true,
+    'ccob_recibo':                     false,
+    // Gestión de Caja
+    'cj_arqueo':                       true,
+    'cj_vale':                         true,
+    'cj_reposicion':                   true,
+    // Presupuestal
+    'pb_variacion':                    true,
+  },
+
+  coord_admin: {
+    // Capital Humano
+    'ch_solicitud_personal':           true,
+    'ch_induccion':                    true,
+    'ch_perfil':                       true,
+    'ch_dnc':                          true,
+    'ch_programa':                     true,
+    'ch_evaluacion':                   true,
+    'ch_salida':                       true,
+    'ch_clima':                        true,
+    'ch_incidencias':                  true,
+    // Compras
+    'co_solicitud':                    true,
+    'co_orden':                        true,
+    'co_catalogo':                     true,
+    'co_evaluacion':                   true,
+    // Mantenimiento
+    'mn_programa':                     true,
+    'mn_ot':                           true,
+    'mn_calibracion':                  true,
+    'mn_bitacora':                     false,
+    // Cuentas por Pagar
+    'cpag_validacion':                 true,
+    'cpag_programacion':               true,
+    'cpag_autorizacion':               false,
+    'cpag_conciliacion':               false,
+    // Cuentas por Cobrar
+    'ccob_catalogo':                   true,
+    'ccob_antiguedad':                 true,
+    'ccob_recibo':                     false,
+    // Gestión de Caja
+    'cj_arqueo':                       true,
+    'cj_vale':                         true,
+    'cj_reposicion':                   true,
+    // Presupuestal
+    'pb_variacion':                    true,
+  },
+
+  coord_lab: {
+    // Capital Humano
+    'ch_solicitud_personal':           true,
+    'ch_induccion':                    false,
+    'ch_perfil':                       false,
+    'ch_dnc':                          false,
+    'ch_programa':                     true,
+    'ch_evaluacion':                   true,
+    'ch_salida':                       false,
+    'ch_clima':                        true,
+    'ch_incidencias':                  false,
+    // Compras
+    'co_solicitud':                    true,
+    'co_orden':                        false,
+    'co_catalogo':                     true,
+    'co_evaluacion':                   false,
+    // Mantenimiento
+    'mn_programa':                     true,
+    'mn_ot':                           true,
+    'mn_calibracion':                  true,
+    'mn_bitacora':                     true,
+    // Cuentas por Pagar
+    'cpag_validacion':                 false,
+    'cpag_programacion':               false,
+    'cpag_autorizacion':               false,
+    'cpag_conciliacion':               false,
+    // Cuentas por Cobrar
+    'ccob_catalogo':                   false,
+    'ccob_antiguedad':                 false,
+    'ccob_recibo':                     false,
+    // Gestión de Caja
+    'cj_arqueo':                       false,
+    'cj_vale':                         false,
+    'cj_reposicion':                   false,
+    // Presupuestal
+    'pb_variacion':                    false,
+  },
+
+  quimico_analista: {
+    // Capital Humano — solo encuesta inducción, salida y clima
+    'ch_solicitud_personal':           false,
+    'ch_induccion':                    true,
+    'ch_perfil':                       false,
+    'ch_dnc':                          false,
+    'ch_programa':                     false,
+    'ch_evaluacion':                   false,
+    'ch_salida':                       true,
+    'ch_clima':                        true,
+    'ch_incidencias':                  false,
+    // Compras — sin acceso
+    'co_solicitud':                    false,
+    'co_orden':                        false,
+    'co_catalogo':                     false,
+    'co_evaluacion':                   false,
+    // Mantenimiento — solo bitácora
+    'mn_programa':                     false,
+    'mn_ot':                           false,
+    'mn_calibracion':                  false,
+    'mn_bitacora':                     true,
+    // Financiero — sin acceso
+    'cpag_validacion':                 false,
+    'cpag_programacion':               false,
+    'cpag_autorizacion':               false,
+    'cpag_conciliacion':               false,
+    'ccob_catalogo':                   false,
+    'ccob_antiguedad':                 false,
+    'ccob_recibo':                     false,
+    'cj_arqueo':                       false,
+    'cj_vale':                         false,
+    'cj_reposicion':                   false,
+    'pb_variacion':                    false,
+  },
+
+  mensajero: {
+    // Solo encuesta de salida y clima
+    'ch_solicitud_personal':           false,
+    'ch_induccion':                    false,
+    'ch_perfil':                       false,
+    'ch_dnc':                          false,
+    'ch_programa':                     false,
+    'ch_evaluacion':                   false,
+    'ch_salida':                       true,
+    'ch_clima':                        true,
+    'ch_incidencias':                  false,
+    'co_solicitud':                    false,
+    'co_orden':                        false,
+    'co_catalogo':                     false,
+    'co_evaluacion':                   false,
+    'mn_programa':                     false,
+    'mn_ot':                           false,
+    'mn_calibracion':                  false,
+    'mn_bitacora':                     false,
+    'cpag_validacion':                 false,
+    'cpag_programacion':               false,
+    'cpag_autorizacion':               false,
+    'cpag_conciliacion':               false,
+    'ccob_catalogo':                   false,
+    'ccob_antiguedad':                 false,
+    'ccob_recibo':                     false,
+    'cj_arqueo':                       false,
+    'cj_vale':                         false,
+    'cj_reposicion':                   false,
+    'pb_variacion':                    false,
+  },
+
+  limpieza: {
+    // Solo encuesta de salida y clima
+    'ch_solicitud_personal':           false,
+    'ch_induccion':                    false,
+    'ch_perfil':                       false,
+    'ch_dnc':                          false,
+    'ch_programa':                     false,
+    'ch_evaluacion':                   false,
+    'ch_salida':                       true,
+    'ch_clima':                        true,
+    'ch_incidencias':                  false,
+    'co_solicitud':                    false,
+    'co_orden':                        false,
+    'co_catalogo':                     false,
+    'co_evaluacion':                   false,
+    'mn_programa':                     false,
+    'mn_ot':                           false,
+    'mn_calibracion':                  false,
+    'mn_bitacora':                     false,
+    'cpag_validacion':                 false,
+    'cpag_programacion':               false,
+    'cpag_autorizacion':               false,
+    'cpag_conciliacion':               false,
+    'ccob_catalogo':                   false,
+    'ccob_antiguedad':                 false,
+    'ccob_recibo':                     false,
+    'cj_arqueo':                       false,
+    'cj_vale':                         false,
+    'cj_reposicion':                   false,
+    'pb_variacion':                    false,
+  },
+
+  admin: {
+    // Acceso total a todo
+  },
+};
+
+/* ── Función auxiliar: ¿puede registrar en este formato? ────────────
+   Usada por loadModule() para habilitar/deshabilitar botones.
+   ─────────────────────────────────────────────────────────────────── */
+function puedeRegistrar(formKey) {
+  if (!SESSION) return false;
+  if (SESSION.rol === 'admin') return true;
+  if (SESSION.rol === 'lector') return false;
+  var puestoPerms = PERMISOS_FORMATO[SESSION.puesto];
+  if (!puestoPerms) return false;
+  // Si la clave no está definida para el puesto, denegar por defecto
+  return puestoPerms[formKey] === true;
+}
+
+/* ── Función de login ────────────────────────────────────────────── */
+function doLogin() {
+  var inputUser = document.getElementById('inp-user').value.trim().toLowerCase();
+  var inputPass = document.getElementById('inp-pass').value;
+  var errEl     = document.getElementById('login-err');
+  var btn       = document.getElementById('login-btn');
+
+  errEl.style.display = 'none';
+
+  if (!inputUser || !inputPass) {
+    errEl.textContent = 'Por favor escribe tu usuario y contraseña.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verificando…';
+
+  /* Pequeño delay para dar sensación de proceso */
+  setTimeout(function() {
+    var usuario = null;
+    for (var i = 0; i < USUARIOS.length; i++) {
+      if (USUARIOS[i].usuario === inputUser && USUARIOS[i].password === inputPass) {
+        usuario = USUARIOS[i];
+        break;
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Iniciar sesión';
+
+    if (!usuario) {
+      errEl.textContent = 'Usuario o contraseña incorrectos. Intenta de nuevo.';
+      errEl.style.display = 'block';
+      document.getElementById('inp-pass').value = '';
+      document.getElementById('inp-pass').focus();
+      return;
+    }
+
+    /* Login exitoso */
+    SESSION = {
+      usuario: usuario.usuario,
+      nombre:  usuario.nombre,
+      rol:     usuario.rol,
+      puesto:  usuario.puesto,
+      modulos: usuario.modulos === '*'
+        ? '*'
+        : usuario.modulos.split(',').map(function(m){ return m.trim(); }),
+      permisos: PERMISOS[usuario.rol]
+    };
+
+    document.getElementById('login-overlay').style.display = 'none';
+    aplicarPermisos();
+    renderDashboard();
+  }, 400);
+}
+
+/* ── Aplica permisos al sidebar y guarda quién inició sesión ─────── */
+function aplicarPermisos() {
+  if (!SESSION) return;
+
+  /* Badge en el header */
+  var roleClass = 'role-' + SESSION.rol;
+  var roleLabel = { admin:'Administrador', editor:'Editor', lector:'Lector' }[SESSION.rol] || SESSION.rol;
+  document.getElementById('hdr-user-area').innerHTML =
+    '<span class="user-badge">' +
+      '<svg viewBox="0 0 20 20" fill="currentColor" width="13" style="opacity:.6"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>' +
+      SESSION.nombre +
+      '<span class="user-role ' + roleClass + '">' + roleLabel + '</span>' +
+    '</span>';
+
+  /* Mostrar/ocultar módulos del sidebar según módulos asignados */
+  var todosMods = ['capital_humano','compras','almacen','mantenimiento',
+                   'cuentas_pagar','cuentas_cobrar','caja','presupuestal'];
+
+  todosMods.forEach(function(mid) {
+    var btn = document.querySelector('button.nav-item[onclick*="\'' + mid + '\'"]');
+    if (!btn) return;
+    var tieneAcceso = SESSION.modulos === '*' ||
+                      SESSION.modulos.indexOf(mid) > -1;
+    btn.style.display = tieneAcceso ? '' : 'none';
+  });
+
+  /* El módulo de Accesos solo lo ve el admin */
+  var btnAccesos = document.querySelector('button.nav-item[onclick*="\'accesos\'"]');
+  if (btnAccesos) {
+    btnAccesos.style.display = SESSION.rol === 'admin' ? '' : 'none';
+  }
+
+  /* Mostrar secciones de Sistema en sidebar solo para admin */
+  document.querySelectorAll('.sb-sec').forEach(function(sec){
+    if (sec.textContent.trim() === 'Sistema') {
+      sec.style.display = SESSION.rol === 'admin' ? '' : 'none';
+    }
+  });
+}
+
+/* ── Aplicar permisos FINOS por formato al cargar un módulo ────────── */
+var _origLoadModule = loadModule;
+loadModule = function(id) {
+  _origLoadModule(id);
+  setTimeout(function() {
+    if (!SESSION) return;
+
+    var hayAlgunaBloqueada = false;
+
+    // Recorrer todos los botones de formulario en la zona de trabajo
+    document.querySelectorAll('#wz [data-form-key]').forEach(function(btn) {
+      var key = btn.getAttribute('data-form-key');
+      var puede = puedeRegistrar(key);
+      if (!puede) {
+        btn.style.opacity       = '0.35';
+        btn.style.pointerEvents = 'none';
+        btn.title               = 'Sin permiso de registro para este formato';
+        hayAlgunaBloqueada = true;
+      } else {
+        btn.style.opacity       = '';
+        btn.style.pointerEvents = '';
+        btn.title               = '';
+      }
+    });
+
+    // Si el rol es lector, bloquear TODOS los btn-primary por si acaso
+    if (SESSION.rol === 'lector') {
+      document.querySelectorAll('#wz .btn-primary').forEach(function(b) {
+        b.style.opacity       = '0.35';
+        b.style.pointerEvents = 'none';
+        b.title               = 'Modo solo lectura';
+      });
+      hayAlgunaBloqueada = true;
+    }
+
+    // Aviso visual si hay botones bloqueados
+    if (hayAlgunaBloqueada) {
+      var existing = document.getElementById('perm-aviso');
+      if (!existing) {
+        var aviso = document.createElement('div');
+        aviso.id = 'perm-aviso';
+        aviso.className = 'alert a-warning';
+        aviso.style.marginBottom = '16px';
+        aviso.innerHTML =
+          '<span class="a-dot"></span>' +
+          '<span>Algunos formatos están en modo <strong>solo lectura</strong> según los permisos de tu puesto. ' +
+          'Los botones en gris no están disponibles para <strong>' + SESSION.nombre + '</strong>.</span>';
+        var wz = document.getElementById('wz');
+        if (wz && wz.firstChild) wz.insertBefore(aviso, wz.firstChild);
+      }
+    }
+  }, 80);
+};
+
+
+/* ── INIT ─────────────────────────────────────────────────────────────── */
+(function(){
+  var now = new Date();
+  document.getElementById('hdrDate').textContent =
+    now.toLocaleDateString('es-MX',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  renderDashboard();
+})();
+</script>
+
+<!-- ════ TEMPLATE: ACCESOS ════ -->
+<template id="tpl-accesos">
+<div class="view">
+
+  <!-- Cabecera del módulo -->
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+    <div class="mc-icon" style="margin:0;width:50px;height:50px;background:var(--lc-neutral-bg);color:var(--lc-text-primary);">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="24"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+    </div>
+    <div>
+      <div style="font-size:22px;font-weight:600;">Control de Accesos</div>
+      <div style="font-size:12px;color:var(--lc-text-secondary);">Roles, permisos y autenticación · conectado a Google Sheets</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs-accesos">
+    <button class="tab active" onclick="swTab('accesos','roles',this)">🔐 Roles y permisos</button>
+    <button class="tab"        onclick="swTab('accesos','sheets',this)">📋 Estructura en Sheets</button>
+    <button class="tab"        onclick="swTab('accesos','login',this)">🔗 Implementar login</button>
+  </div>
+
+  <!-- ══ TAB 1: ROLES Y PERMISOS ═══════════════════════════════════════ -->
+  <div id="tab-accesos-roles">
+
+    <div class="alert a-info mb-lg">
+      <span class="a-dot"></span>
+      <span>El sistema tiene <strong>3 roles</strong>. Los permisos se almacenan en Google Sheets y se consultan al iniciar sesión. Cambia un permiso en Sheets y el sistema lo refleja de inmediato.</span>
+    </div>
+
+    <!-- Tabla de roles x módulos -->
+    <div class="lc-card mb-lg">
+      <div class="sec-label">Matriz de permisos por rol</div>
+      <div style="overflow-x:auto;">
+        <table class="lc-table" style="min-width:600px;">
+          <thead>
+            <tr>
+              <th>Módulo</th>
+              <th style="text-align:center;">👁 Lector<br><span style="font-weight:400;font-size:10px;">Solo ver</span></th>
+              <th style="text-align:center;">✏️ Editor<br><span style="font-weight:400;font-size:10px;">Ver + registrar</span></th>
+              <th style="text-align:center;">🛡 Administrador<br><span style="font-weight:400;font-size:10px;">Ver + registrar + configurar</span></th>
+            </tr>
+          </thead>
+          <tbody id="perm-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Leyenda de acciones -->
+    <div class="lc-card">
+      <div class="sec-label">Definición de acciones por nivel</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:4px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-size:16px;">👁</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Lector</div>
+            <div style="font-size:11px;color:var(--lc-text-secondary);">Puede ver procedimientos, formatos y KPIs del módulo. No puede abrir ni enviar formularios operativos.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-size:16px;">✏️</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Editor</div>
+            <div style="font-size:11px;color:var(--lc-text-secondary);">Todo lo del Lector más acceso a formularios operativos de los módulos asignados. No puede gestionar usuarios ni configuración.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="font-size:16px;">🛡</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Administrador</div>
+            <div style="font-size:11px;color:var(--lc-text-secondary);">Acceso completo a todos los módulos y acciones. Único rol que puede modificar la hoja de usuarios en Sheets y cambiar permisos.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab roles -->
+
+  <!-- ══ TAB 2: ESTRUCTURA EN SHEETS ════════════════════════════════════ -->
+  <div id="tab-accesos-sheets" style="display:none;">
+
+    <div class="alert a-warning mb-lg">
+      <span class="a-dot"></span>
+      <div>Crea un Google Spreadsheet exclusivo para accesos (no mezcles con datos operativos). Solo el Administrador debe tener acceso de edición a este archivo.</div>
+    </div>
+
+    <!-- Hoja 1: Usuarios -->
+    <div class="lc-card mb-lg">
+      <div class="sec-label">Hoja 1 — Usuarios</div>
+      <p style="font-size:12px;color:var(--lc-text-secondary);margin-bottom:12px;">Nombre de la hoja: <code>Usuarios</code> — una fila por usuario.</p>
+      <div class="tbl-wrap" style="border:none;">
+        <table class="lc-table">
+          <thead><tr><th>Columna</th><th>Tipo</th><th>Ejemplo</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>usuario</strong></td><td>Texto</td><td><code>jperez</code></td><td>Sin espacios, minúsculas. Clave primaria.</td></tr>
+            <tr><td><strong>password_hash</strong></td><td>Texto</td><td><code>5f4dcc3b5aa7...</code></td><td>MD5 o SHA-256 de la contraseña. Nunca guardes texto plano.</td></tr>
+            <tr><td><strong>nombre</strong></td><td>Texto</td><td><code>Juan Pérez</code></td><td>Nombre completo para mostrar en la UI.</td></tr>
+            <tr><td><strong>rol</strong></td><td>Texto</td><td><code>editor</code></td><td>Valores válidos: <code>admin</code> / <code>editor</code> / <code>lector</code></td></tr>
+            <tr><td><strong>activo</strong></td><td>Booleano</td><td><code>TRUE</code></td><td>FALSE bloquea el acceso sin borrar el registro.</td></tr>
+            <tr><td><strong>modulos</strong></td><td>Texto</td><td><code>compras,almacen</code></td><td>Módulos asignados separados por coma. <code>*</code> = todos.</td></tr>
+            <tr><td><strong>ultimo_acceso</strong></td><td>Fecha</td><td><code>2026-05-23 10:32</code></td><td>Actualizado por GAS en cada login exitoso.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Hoja 2: Permisos -->
+    <div class="lc-card mb-lg">
+      <div class="sec-label">Hoja 2 — Permisos</div>
+      <p style="font-size:12px;color:var(--lc-text-secondary);margin-bottom:12px;">Nombre de la hoja: <code>Permisos</code> — define qué puede hacer cada rol en cada módulo.</p>
+      <div class="tbl-wrap" style="border:none;">
+        <table class="lc-table">
+          <thead><tr><th>Columna</th><th>Tipo</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>modulo</strong></td><td>Texto</td><td><code>compras</code></td></tr>
+            <tr><td><strong>rol</strong></td><td>Texto</td><td><code>editor</code></td></tr>
+            <tr><td><strong>ver</strong></td><td>Booleano</td><td><code>TRUE</code></td></tr>
+            <tr><td><strong>registrar</strong></td><td>Booleano</td><td><code>TRUE</code></td></tr>
+            <tr><td><strong>configurar</strong></td><td>Booleano</td><td><code>FALSE</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert a-info" style="margin-top:12px;">
+        <span class="a-dot"></span>
+        <span>Modifica solo esta hoja para ajustar permisos sin tocar código. Ejemplo: quitar acceso de registro al Editor en Compras → cambia <code>registrar</code> a <code>FALSE</code> en esa fila.</span>
+      </div>
+    </div>
+
+    <!-- Hoja 3: Sesiones -->
+    <div class="lc-card">
+      <div class="sec-label">Hoja 3 — Sesiones (opcional)</div>
+      <p style="font-size:12px;color:var(--lc-text-secondary);margin-bottom:12px;">Bitácora de accesos para auditoría. GAS escribe una fila por cada login.</p>
+      <div class="tbl-wrap" style="border:none;">
+        <table class="lc-table">
+          <thead><tr><th>Columna</th><th>Ejemplo</th></tr></thead>
+          <tbody>
+            <tr><td><strong>timestamp</strong></td><td><code>2026-05-23 10:32:05</code></td></tr>
+            <tr><td><strong>usuario</strong></td><td><code>jperez</code></td></tr>
+            <tr><td><strong>resultado</strong></td><td><code>OK</code> / <code>FAIL</code></td></tr>
+            <tr><td><strong>ip</strong></td><td><code>192.168.1.15</code> (solo en Apache)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab sheets -->
+
+  <!-- ══ TAB 3: IMPLEMENTAR LOGIN ════════════════════════════════════════ -->
+  <div id="tab-accesos-login" style="display:none;">
+
+    <div class="alert a-warning mb-lg">
+      <span class="a-dot"></span>
+      <div><strong>Seguridad importante:</strong> El login en un archivo HTML estático no es 100% seguro. Esta implementación es adecuada para una red interna (LAN / Apache corporativo). Para acceso público desde Internet, considera una solución más robusta.</div>
+    </div>
+
+    <!-- Paso 1 -->
+    <div class="lc-card mb-lg">
+      <div class="sec-label">Cómo conectar — 4 pasos</div>
+
+      <div class="proc">
+        <div class="proc-num">1</div>
+        <div style="flex:1;">
+          <div class="proc-title">Crea el Spreadsheet de accesos y obtén su ID</div>
+          <div class="proc-desc">Crea las 3 hojas: <code>Usuarios</code>, <code>Permisos</code>, <code>Sesiones</code>. Copia el ID de la URL.</div>
+        </div>
+      </div>
+
+      <div class="proc">
+        <div class="proc-num">2</div>
+        <div style="flex:1;">
+          <div class="proc-title">Agrega esta función en tu <code>Code.gs</code> de Google Apps Script</div>
+          <div class="proc-desc">Recibe usuario y contraseña (hasheada en el cliente), valida contra Sheets y devuelve los permisos.</div>
+          <pre>var SS_ACCESOS = SpreadsheetApp.openById("TU_ID_ACCESOS_AQUI");
+
+function login(usuario, passwordHash) {
+  var hoja = SS_ACCESOS.getSheetByName("Usuarios");
+  var datos = hoja.getDataRange().getValues();
+  var headers = datos[0];
+  var iUser = headers.indexOf("usuario");
+  var iHash = headers.indexOf("password_hash");
+  var iNombre = headers.indexOf("nombre");
+  var iRol = headers.indexOf("rol");
+  var iActivo = headers.indexOf("activo");
+  var iMods = headers.indexOf("modulos");
+  var iUlt = headers.indexOf("ultimo_acceso");
+
+  for (var i = 1; i < datos.length; i++) {
+    var fila = datos[i];
+    if (fila[iUser] === usuario &&
+        fila[iHash] === passwordHash &&
+        fila[iActivo] === true) {
+
+      // Actualizar último acceso
+      hoja.getRange(i + 1, iUlt + 1).setValue(new Date());
+
+      // Leer permisos del rol
+      var perms = getPermisosRol(fila[iRol]);
+
+      // Registrar sesión
+      logSesion(usuario, "OK");
+
+      return JSON.stringify({
+        ok: true,
+        nombre: fila[iNombre],
+        rol: fila[iRol],
+        modulos: fila[iMods].split(",").map(function(m){ return m.trim(); }),
+        permisos: perms
+      });
+    }
+  }
+  logSesion(usuario, "FAIL");
+  return JSON.stringify({ ok: false });
+}
+
+function getPermisosRol(rol) {
+  var hoja = SS_ACCESOS.getSheetByName("Permisos");
+  var datos = hoja.getDataRange().getValues();
+  var headers = datos[0];
+  var perms = {};
+  for (var i = 1; i < datos.length; i++) {
+    if (datos[i][headers.indexOf("rol")] === rol) {
+      var mod = datos[i][headers.indexOf("modulo")];
+      perms[mod] = {
+        ver:        datos[i][headers.indexOf("ver")],
+        registrar:  datos[i][headers.indexOf("registrar")],
+        configurar: datos[i][headers.indexOf("configurar")]
+      };
+    }
+  }
+  return perms;
+}
+
+function logSesion(usuario, resultado) {
+  var hoja = SS_ACCESOS.getSheetByName("Sesiones");
+  if (hoja) hoja.appendRow([new Date(), usuario, resultado]);
+}</pre>
+        </div>
+      </div>
+
+      <div class="proc">
+        <div class="proc-num">3</div>
+        <div style="flex:1;">
+          <div class="proc-title">Agrega la pantalla de login y la lógica de sesión al <code>index.html</code></div>
+          <div class="proc-desc">Pega este bloque justo antes de <code>&lt;/body&gt;</code>. Muestra el login al cargar; al autenticarse, guarda la sesión en <code>sessionStorage</code> y aplica permisos.</div>
+          <pre>/* ── LOGIN OVERLAY ─────────────────────────── */
+/* Pegar en la sección &lt;style&gt; del index.html */
+#login-overlay {
+  position:fixed; inset:0; background:rgba(15,31,46,0.92);
+  display:flex; align-items:center; justify-content:center;
+  z-index:999;
+}
+.login-card {
+  background:var(--lc-bg-card); border-radius:var(--r-lg);
+  padding:36px 32px; width:340px; box-shadow:0 8px 40px rgba(0,0,0,.3);
+}
+.login-card h2 { font-size:18px; font-weight:600; margin-bottom:4px; }
+.login-card p  { font-size:12px; color:var(--lc-text-secondary); margin-bottom:24px; }
+.lc-input {
+  width:100%; padding:9px 12px; border:1px solid var(--lc-border-strong);
+  border-radius:var(--r-md); font-family:var(--lc-font-sans); font-size:13px;
+  margin-bottom:12px; outline:none; transition:border-color .15s;
+}
+.lc-input:focus { border-color:var(--lc-primary); }
+.login-err { font-size:12px; color:var(--lc-secondary); margin-top:8px; display:none; }
+.login-loading { font-size:12px; color:var(--lc-text-secondary); margin-top:8px; display:none; }</pre>
+          <pre>/* ── HTML — pegar justo antes de &lt;/body&gt; ─── */
+&lt;div id="login-overlay"&gt;
+  &lt;div class="login-card"&gt;
+    &lt;div class="sb-logoicon" style="margin-bottom:16px;"&gt;
+      &lt;svg viewBox="0 0 20 20" fill="currentColor" width="20"&gt;
+        &lt;path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/&gt;
+      &lt;/svg&gt;
+    &lt;/div&gt;
+    &lt;h2&gt;Laboratorio Chavira&lt;/h2&gt;
+    &lt;p&gt;Ingresa tus credenciales para continuar&lt;/p&gt;
+    &lt;input id="inp-user" class="lc-input" type="text" placeholder="Usuario" autocomplete="username"/&gt;
+    &lt;input id="inp-pass" class="lc-input" type="password" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()"/&gt;
+    &lt;button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="doLogin()"&gt;Iniciar sesión&lt;/button&gt;
+    &lt;div class="login-err" id="login-err"&gt;Usuario o contraseña incorrectos.&lt;/div&gt;
+    &lt;div class="login-loading" id="login-loading"&gt;Verificando…&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+          <pre>/* ── JS — pegar en el bloque &lt;script&gt; del index.html ─── */
+
+var SESSION = null; // { nombre, rol, modulos, permisos }
+
+function sha256(str) {
+  // Usa SubtleCrypto (nativo en todos los browsers modernos)
+  return crypto.subtle.digest("SHA-256",
+    new TextEncoder().encode(str)
+  ).then(function(buf){
+    return Array.from(new Uint8Array(buf))
+      .map(function(b){ return b.toString(16).padStart(2,'0'); })
+      .join('');
+  });
+}
+
+function doLogin() {
+  var user = document.getElementById('inp-user').value.trim().toLowerCase();
+  var pass = document.getElementById('inp-pass').value;
+  if (!user || !pass) return;
+
+  document.getElementById('login-err').style.display     = 'none';
+  document.getElementById('login-loading').style.display = 'block';
+
+  sha256(pass).then(function(hash) {
+    google.script.run
+      .withSuccessHandler(function(json) {
+        document.getElementById('login-loading').style.display = 'none';
+        var res = JSON.parse(json);
+        if (res.ok) {
+          SESSION = res;
+          sessionStorage.setItem('sgc_session', json);
+          document.getElementById('login-overlay').style.display = 'none';
+          aplicarPermisos();
+        } else {
+          document.getElementById('login-err').style.display = 'block';
+        }
+      })
+      .withFailureHandler(function() {
+        document.getElementById('login-loading').style.display = 'none';
+        document.getElementById('login-err').textContent = 'Error de conexión.';
+        document.getElementById('login-err').style.display = 'block';
+      })
+      .login(user, hash);
+  });
+}
+
+function aplicarPermisos() {
+  if (!SESSION) return;
+  var rol = SESSION.rol;
+  var mods = SESSION.modulos; // array o ['*']
+  var todosLos = ['capital_humano','compras','almacen','mantenimiento',
+                  'cuentas_pagar','cuentas_cobrar','caja','presupuestal'];
+
+  // Ocultar módulos no asignados del sidebar
+  todosLos.forEach(function(mid) {
+    var btn = document.querySelector('.nav-item[onclick*="go(\''+mid+'\',"]');
+    if (!btn) return;
+    var visible = mods[0] === '*' || mods.indexOf(mid) > -1;
+    btn.style.display = visible ? '' : 'none';
+  });
+
+  // Mostrar nombre de usuario en el header
+  var badge = document.getElementById('hdrDate');
+  if (badge) badge.textContent = SESSION.nombre + ' · ' + SESSION.rol;
+}
+
+// Intentar restaurar sesión al cargar
+(function initSession() {
+  var saved = sessionStorage.getItem('sgc_session');
+  if (saved) {
+    try {
+      SESSION = JSON.parse(saved);
+      document.getElementById('login-overlay').style.display = 'none';
+      aplicarPermisos();
+    } catch(e) { sessionStorage.removeItem('sgc_session'); }
+  }
+})();</pre>
+        </div>
+      </div>
+
+      <div class="proc">
+        <div class="proc-num">4</div>
+        <div style="flex:1;">
+          <div class="proc-title">Aplicar permisos dentro de cada módulo</div>
+          <div class="proc-desc">Agrega este snippet al inicio de la función <code>loadModule(id)</code> existente para bloquear el botón de formularios si el usuario es Lector.</div>
+          <pre>// Al final de loadModule(), después de inyectar el template:
+if (SESSION) {
+  var perms = SESSION.permisos[id] || {};
+  // Si no tiene permiso de registrar, deshabilitar botones operativos
+  if (!perms.registrar) {
+    document.querySelectorAll('#wz .btn-primary').forEach(function(b){
+      b.style.opacity = '0.4';
+      b.style.pointerEvents = 'none';
+      b.title = 'No tienes permiso para registrar en este módulo';
+    });
+  }
+}</pre>
+        </div>
+      </div>
+
+    </div><!-- /card pasos -->
+
+    <div class="alert a-info">
+      <span class="a-dot"></span>
+      <span><strong>Para uso sin GAS (Apache puro):</strong> reemplaza la llamada a <code>google.script.run</code> por un <code>fetch()</code> a un endpoint PHP o Node.js que consulte Sheets vía la API de Google. El resto del código es idéntico.</span>
+    </div>
+
+  </div><!-- /tab login -->
+
+</div>
+</template>
+
+</body>
+</html>
